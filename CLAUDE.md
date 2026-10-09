@@ -5,7 +5,7 @@ Public companion site for Worlds 2026 (Oct 15 – Nov 14, 2026). Two modules, no
 - Founding brief: `docs/brief.md` (vision, scope, stack, data model, timeline, risks). The brief predates the naming: "Pause Arcade" there means Tab Out.
 - Glossary: `CONTEXT.md`. Use its vocabulary in code, issues and docs.
 - Decisions: `docs/adr/`.
-- Plan: the GitHub issue labelled `wayfinder:map` is the index of decisions and open tickets (link in `README.md`).
+- Plan: [All Chat — wayfinder map](https://github.com/HoreKk/all-chat/issues/1) (labelled `wayfinder:map`) is the index of decisions and open tickets. Work it with `/wayfinder`.
 
 ## Working rules
 
