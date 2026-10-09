@@ -9,6 +9,21 @@ A public companion site for Worlds 2026 (Oct 15 – Nov 14, 2026). Two modules, 
 
 Map charted on 2026-10-09: 30 tickets, frontier open. The plan lives on the issue tracker as a wayfinder map: [All Chat — wayfinder map](https://github.com/HoreKk/all-chat/issues/1) indexes the decisions made so far and points at the open tickets.
 
+## Run locally
+
+Node 24 (`.node-version`), pnpm and Docker.
+
+```bash
+cp .env.example .env   # then fill LOL_API_KEY
+pnpm install
+pnpm db:up             # Postgres 17 on localhost:5433
+pnpm db:push           # apply the schema (no migrations yet)
+pnpm db:seed           # first schedule sync: stages, tournament days, matches
+pnpm dev               # http://localhost:3000
+```
+
+`pnpm db:studio` opens Drizzle Studio, which is also the admin console (ADR-0005). `pnpm db:seed --reset` empties a local database first.
+
 ## Documents
 
 - [Founding brief](docs/brief.md)

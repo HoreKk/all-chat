@@ -30,3 +30,9 @@ logs
 .cache
 coverage
 .turbo
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# Drizzle migrations (schema is pushed with `pnpm db:push` until the first deploy)
+drizzle

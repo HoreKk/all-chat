@@ -25,7 +25,7 @@ A guest participant: a nickname plus an opaque id, minted on a person's first su
 _Avoid_: user, account, member, visitor
 
 **Admin**:
-An identity allowed to enter the calendar, hide quotes and merge duplicates.
+The developer, acting through Drizzle Studio on the database: corrects matches, hides quotes and merges duplicates. Not an identity; v0 has no admin flag or admin procedures (ADR-0005).
 _Avoid_: moderator, owner
 
 **Tournament**:
@@ -33,7 +33,7 @@ Worlds 2026 as a whole, Oct 15 – Nov 14, 2026; the scope of the tournament bal
 _Avoid_: event, competition, Worlds (alone, in code)
 
 **Stage**:
-One of the five phases of the tournament: Play-Ins, Swiss, Quarterfinals, Semifinals, Final.
+One of the five phases of the tournament: Play-Ins, Swiss, Quarterfinals, Semifinals, Finals; one lolesports schedule block each.
 _Avoid_: phase, round (reserved for Tab Out), bracket
 
 **Tournament day**:
@@ -41,12 +41,16 @@ A calendar day with matches, belonging to one stage; the Quote Wall's unit of or
 _Avoid_: match day, game day, day (alone, when ambiguous)
 
 **Match**:
-A scheduled series between two teams on a tournament day, entered by the admin (e.g. "T1 vs G2").
+A scheduled series between two teams on a tournament day (e.g. "T1 vs G2"), mirrored from the lolesports schedule; its opponents read "TBD" until the bracket decides them. It belongs to the tournament day of its Paris start time minus 12 hours.
 _Avoid_: game (reserved for Tab Out), series, fixture
 
 **Calendar**:
-The admin-entered set of stages, tournament days and matches. Not fed by any live esports source.
-_Avoid_: schedule, fixtures
+The set of stages, tournament days and matches, all mirrored from the lolesports schedule by the schedule sync: matches as published, stages and tournament days derived from them.
+_Avoid_: schedule (reserved for the lolesports feed), fixtures
+
+**Schedule sync**:
+The polling fiber that mirrors the Worlds schedule from lolesports into the calendar. Schedule data only, never live game data.
+_Avoid_: scheduler (reserved for the ballot lifecycle fiber), import, scraper
 
 ### Quote Wall
 
