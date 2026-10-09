@@ -12,7 +12,7 @@ Public companion site for Worlds 2026 (Oct 15 – Nov 14, 2026). Two modules, no
 - **Boundary rule.** React components call oRPC procedures and nothing else. oRPC handlers are thin: validate, resolve the identity, `yield*` a service. All logic lives in Effect services, which never import oRPC (see ADR-0001).
 - **Ship order.** Quote Wall before Oct 15, Tab Out before Oct 23. The arcade must not eat the wall's budget.
 - **Database access.** Postgres through the Drizzle release candidate and its built-in Effect integration, provided in the app `Layer`; handlers never query the database directly (ADR-0004).
-- **Moving targets.** oRPC v2 is beta, `@orpc/experimental-effect` is experimental, Effect v4 is new. Pin exact versions; keep anything touching them in one folder.
+- **Moving targets.** oRPC v2 is beta and `@orpc/experimental-effect` is experimental; Effect 4.0 is released and is the target, though some of its newer modules are still tagged unstable. Pin exact versions; keep anything touching oRPC in one folder.
 
 ## Agent skills
 
