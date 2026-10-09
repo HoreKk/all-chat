@@ -7,7 +7,7 @@ A public companion site for Worlds 2026 (Oct 15 – Nov 14, 2026). Two modules, 
 
 ## Status
 
-Charting. The plan lives on the issue tracker as a wayfinder map: [All Chat — wayfinder map](https://github.com/HoreKk/all-chat/issues/1) indexes the decisions made so far and points at the open tickets.
+Map charted on 2026-10-09: 30 tickets, frontier open. The plan lives on the issue tracker as a wayfinder map: [All Chat — wayfinder map](https://github.com/HoreKk/all-chat/issues/1) indexes the decisions made so far and points at the open tickets.
 
 ## Documents
 
