@@ -1,5 +1,5 @@
 // Bootstraps a fresh database with one schedule sync: stages, tournament days and matches, all
-// derived from the lolesports schedule. The sync is an idempotent upsert, so rerunning is safe.
+// mirrored from the lolesports schedule (stages and days are views over the matches). The sync is an idempotent upsert, so rerunning is safe.
 // Later changes come from the polling fiber; anything wrong is fixed by hand in Drizzle Studio (`pnpm db:studio`).
 //
 //   pnpm db:seed            everything (today: the calendar scope)
@@ -22,14 +22,14 @@ if (args.includes("--reset")) {
   const host = new URL(url).hostname
   if (host !== "localhost" && host !== "127.0.0.1") throw new Error(`--reset refused on ${host}: local databases only`)
   const db = drizzle(url)
-  await reset(db, schema)
+  await reset(db, { match: schema.match })
   await db.$client.end()
   console.log("reset: tables emptied")
 }
 
 const calendar = Effect.gen(function* () {
   const { upserted } = yield* (yield* ScheduleSync).syncOnce
-  yield* Effect.logInfo(`calendar: ${upserted} matches synced from lolesports, with their stages and tournament days`)
+  yield* Effect.logInfo(`calendar: ${upserted} matches synced from lolesports`)
 })
 
 if (all || scopes.has("calendar")) {

@@ -45,7 +45,7 @@ A scheduled series between two teams on a tournament day (e.g. "T1 vs G2"), mirr
 _Avoid_: game (reserved for Tab Out), series, fixture
 
 **Calendar**:
-The set of stages, tournament days and matches, all mirrored from the lolesports schedule by the schedule sync: matches as published, stages and tournament days derived from them.
+The set of stages, tournament days and matches, mirrored from the lolesports schedule by the schedule sync. Only matches are stored; stages and tournament days are views derived from them.
 _Avoid_: schedule (reserved for the lolesports feed), fixtures
 
 **Schedule sync**:

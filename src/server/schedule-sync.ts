@@ -1,6 +1,6 @@
 import { sql } from "drizzle-orm"
 import { Context, Duration, Effect, Layer } from "effect"
-import { match, stage, tournamentDay } from "../db/schema.ts"
+import { match } from "../db/schema.ts"
 import { Db } from "./db.ts"
 import { LolEsports, type ScheduleEvent } from "./lolesports.ts"
 
@@ -16,23 +16,13 @@ const inWindow = (e: ScheduleEvent) => {
   return t >= windowStart && t < windowEnd
 }
 
-export const stageSlug = (blockName: string) =>
-  blockName
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "")
-
-// Same rule as the generated `match.day` column: the Paris date of the start minus 12 hours.
-const parisDate = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris" })
-export const tournamentDayOf = (startsAt: Date) => parisDate.format(new Date(startsAt.getTime() - 12 * 3_600_000))
-
 const toRow = (e: ScheduleEvent, syncedAt: Date) => {
   const [t1, t2] = e.match!.teams
   return {
     esportsId: e.match!.id,
     startsAt: new Date(e.startTime),
     state: e.state,
-    stageId: stageSlug(e.blockName ?? "unknown"),
+    stageName: e.blockName ?? "unknown",
     bestOf: e.match!.strategy.count,
     team1Code: t1?.code ?? "TBD",
     team1Name: t1?.name ?? "TBD",
@@ -46,32 +36,7 @@ const toRow = (e: ScheduleEvent, syncedAt: Date) => {
 
 const excluded = (column: string) => sql.raw(`excluded."${column}"`)
 
-/**
- * Stages and tournament days derived from matches sorted by start time: a stage per block name,
- * positioned by its first match; a day per distinct tournament day, in the stage of its first match.
- */
-export const deriveCalendar = (events: ReadonlyArray<ScheduleEvent>) => {
-  const sorted = [...events].sort((a, b) => Date.parse(a.startTime) - Date.parse(b.startTime))
-  const stages = new Map<string, { id: string; name: string; position: number; startsOn: string; endsOn: string }>()
-  const days = new Map<string, { date: string; stageId: string }>()
-  for (const e of sorted) {
-    const name = e.blockName ?? "unknown"
-    const id = stageSlug(name)
-    const day = tournamentDayOf(new Date(e.startTime))
-    const existing = stages.get(id)
-    if (existing) existing.endsOn = day
-    else stages.set(id, { id, name, position: stages.size + 1, startsOn: day, endsOn: day })
-    if (!days.has(day)) days.set(day, { date: day, stageId: id })
-  }
-  const dayRows = [...days.values()].map((d) => {
-    const sameStage = [...days.values()].filter((x) => x.stageId === d.stageId)
-    const name = stages.get(d.stageId)!.name
-    return { ...d, label: sameStage.length === 1 ? name : `${name} day ${sameStage.indexOf(d) + 1}` }
-  })
-  return { stages: [...stages.values()], days: dayRows }
-}
-
-/** Mirrors the Worlds schedule from lolesports into the `stage`, `tournament_day` and `match` tables. */
+/** Mirrors the Worlds schedule from lolesports into the `match` table; the `stage` and `tournament_day` views follow. */
 export class ScheduleSync extends Context.Service<
   ScheduleSync,
   {
@@ -109,26 +74,6 @@ export class ScheduleSync extends Context.Service<
         const syncedAt = new Date()
         const rows = [...new Map(events.map((e) => [e.match!.id, toRow(e, syncedAt)])).values()]
         if (rows.length > 0) {
-          const calendar = deriveCalendar(events)
-          yield* db
-            .insert(stage)
-            .values(calendar.stages)
-            .onConflictDoUpdate({
-              target: stage.id,
-              set: {
-                name: excluded("name"),
-                position: excluded("position"),
-                startsOn: excluded("starts_on"),
-                endsOn: excluded("ends_on")
-              }
-            })
-          yield* db
-            .insert(tournamentDay)
-            .values(calendar.days)
-            .onConflictDoUpdate({
-              target: tournamentDay.date,
-              set: { stageId: excluded("stage_id"), label: excluded("label") }
-            })
           yield* db
             .insert(match)
             .values(rows)
@@ -137,7 +82,7 @@ export class ScheduleSync extends Context.Service<
               set: {
                 startsAt: excluded("starts_at"),
                 state: excluded("state"),
-                stageId: excluded("stage_id"),
+                stageName: excluded("stage_name"),
                 bestOf: excluded("best_of"),
                 team1Code: excluded("team1_code"),
                 team1Name: excluded("team1_name"),
