@@ -1,0 +1,32 @@
+# Dependencies
+node_modules
+
+# Build outputs
+dist
+build
+.output
+*.tsbuildinfo
+
+# Environment
+.env
+.env*.local
+
+# Local data
+*.db
+*.db-journal
+*.sqlite
+
+# Editors / OS
+.idea
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+*.swp
+.DS_Store
+
+# Logs & caches
+logs
+*.log
+.cache
+coverage
+.turbo
