@@ -1,5 +1,5 @@
 ---
-status: accepted
+status: amended by ADR-0004 (Postgres with Drizzle replaces SQLite)
 ---
 
 # One long-lived Node process with SQLite
