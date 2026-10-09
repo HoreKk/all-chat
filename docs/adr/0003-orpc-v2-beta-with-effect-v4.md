@@ -13,7 +13,7 @@ The version-pinning ticket checked these against the npm registry, the tarballs 
 - `@orpc/server`, `@orpc/client`, `@orpc/experimental-effect`, `@orpc/tanstack-query`: `2.0.0-beta.43`. The `latest` tag of `@orpc/experimental-effect` is the v1 bridge, so it is never installed untagged.
 - `effect`, `@effect/sql-pg`, `@effect/vitest`: `4.0.2` (`TestClock` from `effect/testing`, `it.effect` from `@effect/vitest`).
 - `@tanstack/react-start` `1.168.60`, `@tanstack/react-router` `1.170.41`, `@tanstack/react-query` `5.104.1`; `react` / `react-dom` `19.3.0`; `vite` `8.3.4`; `vitest` `5.0.3`; `typescript` `7.0.2`; Node 24 LTS.
-- `drizzle-orm` / `drizzle-kit`: open. The `rc` tag (`1.0.0-rc.4`) crashes on load against Effect 4.0; only the commit build `1.0.0-rc.5-5935859` runs. The choice belongs to ADR-0004 and its own ticket on the map.
+- `drizzle-orm` / `drizzle-kit`: `1.0.0-rc.5-5935859` (`rc5` dist-tag, a commit build). The `rc` tag (`1.0.0-rc.4`) crashes on load against Effect 4.0; rc5 carries Drizzle's Effect 4.0 release fixes. See ADR-0004.
 - `pg` `8.23.1` (dev only, for `drizzle-kit`); no Postgres driver at runtime, since `@effect/sql-pg` speaks the protocol itself.
 
 All four bridge exports the spike depends on (`handlerGen`, `middlewareGen`, the `effect/wrap` context key, `extensions/input-output`) are present. `effect/wrap` runs once per effect, not once per request: the app context is built once and passed through `'effect/context'`, and `effect/wrap` is kept for tracing. Signing and cookie helpers are functions in `@orpc/server/helpers`.
