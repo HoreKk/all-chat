@@ -66,10 +66,10 @@ A vote held over a set of candidates within a scope, open between an opening and
 _Avoid_: poll, election, contest, voting round
 
 **Day ballot**:
-The ballot over every visible quote of one tournament day, open from the day's first match until noon Paris time the next day. Its winner is the Quote of the day.
+The ballot over every visible quote of one tournament day, open from the day's first match until the next tournament day's first match starts. Its winner is the Quote of the day.
 
 **Stage ballot**:
-The ballot over a stage's daily winners (and possibly runners-up), open for 48 hours once the stage ends. Its winner is the Quote of the stage.
+The ballot over a stage's daily winners (and possibly runners-up), open once the stage ends and closing when the next stage's first match starts. Its winner is the Quote of the stage.
 
 **Tournament ballot**:
 The ballot over the five stage winners, open for 72 hours after the final. Its winner is the Quote of Worlds 2026.
