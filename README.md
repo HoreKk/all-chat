@@ -14,7 +14,7 @@ Map charted on 2026-10-09: 30 tickets, frontier open. The plan lives on the issu
 Node 24 (`.node-version`), pnpm and Docker.
 
 ```bash
-cp .env.example .env   # then fill LOL_API_KEY
+cp .env.example .env   # then fill LOL_API_KEY (LOL_TOURNAMENTS defaults to worlds_2026)
 pnpm install
 pnpm db:up             # Postgres 17 on localhost:5433
 pnpm db:push           # apply the schema (no migrations yet)

@@ -12,6 +12,8 @@ export const match = pgTable(
   "match",
   {
     esportsId: text("esports_id").primaryKey(),
+    // The lolesports tournament slug, e.g. "worlds_2026" (LOL_TOURNAMENTS lists which are synced)
+    tournamentSlug: text("tournament_slug").notNull(),
     startsAt: timestamp("starts_at", { withTimezone: true, mode: "date" }).notNull(),
     // A match belongs to the tournament day of its Paris start time minus 12 hours,
     // so a 01:30 knockout match stays on the day that started at 23:00.
@@ -34,35 +36,40 @@ export const match = pgTable(
     team2Wins: smallint("team2_wins").notNull().default(0),
     syncedAt: timestamp("synced_at", { withTimezone: true, mode: "date" }).notNull()
   },
-  (t) => [index("match_starts_at_idx").on(t.startsAt), index("match_day_idx").on(t.day)]
+  (t) => [index("match_starts_at_idx").on(t.startsAt), index("match_tournament_day_idx").on(t.tournamentSlug, t.day)]
 )
 
-/** One stage per schedule block, positioned by its first match. */
+/** One stage per tournament and schedule block, positioned by its first match within the tournament. */
 export const stage = pgView("stage", {
+  tournamentSlug: text("tournament_slug").notNull(),
   id: text("id").notNull(),
   name: text("name").notNull(),
   position: integer("position").notNull(),
   startsOn: date("starts_on", { mode: "string" }).notNull(),
   endsOn: date("ends_on", { mode: "string" }).notNull()
 }).as(sql`
-  select stage_id as id, min(stage_name) as name,
-    (row_number() over (order by min(starts_at)))::int as position,
+  select tournament_slug, stage_id as id, min(stage_name) as name,
+    (row_number() over (partition by tournament_slug order by min(starts_at)))::int as position,
     min(day) as starts_on, max(day) as ends_on
   from ${match}
-  group by stage_id
+  group by tournament_slug, stage_id
 `)
 
-/** One tournament day per date holding matches, in the stage of its first match ("Swiss day 3"). */
+/** One tournament day per tournament and date holding matches, in the stage of its first match ("Swiss day 3"). */
 export const tournamentDay = pgView("tournament_day", {
+  tournamentSlug: text("tournament_slug").notNull(),
   date: date("date", { mode: "string" }).notNull(),
   stageId: text("stage_id").notNull(),
   label: text("label").notNull()
 }).as(sql`
-  select day as date, stage_id,
-    case when count(*) over (partition by stage_id) = 1 then stage_name
-      else stage_name || ' day ' || row_number() over (partition by stage_id order by day)
+  select tournament_slug, day as date, stage_id,
+    case when count(*) over (partition by tournament_slug, stage_id) = 1 then stage_name
+      else stage_name || ' day ' || row_number() over (partition by tournament_slug, stage_id order by day)
     end as label
-  from (select distinct on (day) day, stage_id, stage_name from ${match} order by day, starts_at) as first_match
+  from (
+    select distinct on (tournament_slug, day) tournament_slug, day, stage_id, stage_name
+    from ${match} order by tournament_slug, day, starts_at
+  ) as first_match
 `)
 
 export type MatchState = (typeof matchState.enumValues)[number]

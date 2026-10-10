@@ -29,7 +29,7 @@ The developer, acting through Drizzle Studio on the database: corrects matches, 
 _Avoid_: moderator, owner
 
 **Tournament**:
-Worlds 2026 as a whole, Oct 15 – Nov 14, 2026; the scope of the tournament ballot.
+Worlds 2026 as a whole, Oct 15 – Nov 14, 2026; the scope of the tournament ballot. In the calendar, identified by its lolesports slug (`worlds_2026`); the schedule sync can mirror others listed in `LOL_TOURNAMENTS`.
 _Avoid_: event, competition, Worlds (alone, in code)
 
 **Stage**:
