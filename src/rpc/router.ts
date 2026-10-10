@@ -1,5 +1,5 @@
-import { CalendarOverview } from "../db/entities.ts"
-import { Calendar } from "../server/calendar.ts"
+import { CalendarOverview } from "@/db/entities.ts"
+import { Calendar } from "@/server/calendar.ts"
 import { base } from "./base.ts"
 
 export const router = {

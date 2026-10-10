@@ -1,6 +1,8 @@
+import { Card, Container, Heading, HStack, List, Text } from "@chakra-ui/react"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
-import { client, orpc } from "../rpc/client.ts"
+import type { ReactNode } from "react"
+import { client, orpc } from "@/rpc/client.ts"
 
 export const Route = createFileRoute("/")({
   loader: () => client.calendar.overview(),
@@ -26,50 +28,81 @@ function Home() {
   const { nextMatch, stages } = data
 
   return (
-    <main>
+    <Container as="main" maxW="40rem" px="4" pt="10" pb="16">
       <header>
-        <h1>All Chat</h1>
-        <p className="lede">Worlds 2026 · Oct 15 – Nov 14</p>
+        <Heading as="h1" size="3xl" letterSpacing="tight">
+          All Chat
+        </Heading>
+        <Text mt="1" color="fg.muted">
+          Worlds 2026 · Oct 15 – Nov 14
+        </Text>
       </header>
 
       <section aria-labelledby="next-match">
-        <h2 id="next-match">{nextMatch?.state === "inProgress" ? "Live now" : "Next match"}</h2>
+        <SectionHeading id="next-match">{nextMatch?.state === "inProgress" ? "Live now" : "Next match"}</SectionHeading>
         {nextMatch ? (
-          <article className="match">
-            <p className="when">
-              {nextMatch.dayLabel ?? nextMatch.day} · {paris.format(nextMatch.startsAt)} Paris
-            </p>
-            <p className="teams">
-              <span title={nextMatch.team1Name}>{nextMatch.team1Code}</span>
-              {nextMatch.state === "inProgress" ? (
-                <span className="score">
-                  {nextMatch.team1Wins} – {nextMatch.team2Wins}
-                </span>
-              ) : (
-                <span className="vs">vs</span>
-              )}
-              <span title={nextMatch.team2Name}>{nextMatch.team2Code}</span>
-            </p>
-            <p className="format">Best of {nextMatch.bestOf}</p>
-          </article>
+          <Card.Root as="article" bg="bg.panel" rounded="xl">
+            <Card.Body p="5">
+              <Text color="fg.muted" textStyle="sm">
+                {nextMatch.dayLabel ?? nextMatch.day} · {paris.format(nextMatch.startsAt)} Paris
+              </Text>
+              <HStack justify="center" align="baseline" gap="4" my="4" fontSize="2rem" fontWeight="bold">
+                <span title={nextMatch.team1Name}>{nextMatch.team1Code}</span>
+                {nextMatch.state === "inProgress" ? (
+                  <Text as="span" color="accent" fontVariantNumeric="tabular-nums">
+                    {nextMatch.team1Wins} – {nextMatch.team2Wins}
+                  </Text>
+                ) : (
+                  <Text as="span" textStyle="md" fontWeight="normal" color="fg.muted">
+                    vs
+                  </Text>
+                )}
+                <span title={nextMatch.team2Name}>{nextMatch.team2Code}</span>
+              </HStack>
+              <Text color="fg.muted" textStyle="sm">
+                Best of {nextMatch.bestOf}
+              </Text>
+            </Card.Body>
+          </Card.Root>
         ) : (
-          <p>No upcoming match.</p>
+          <Text>No upcoming match.</Text>
         )}
       </section>
 
       <section aria-labelledby="stages">
-        <h2 id="stages">Stages</h2>
-        <ol className="stages">
-          {stages.map((s) => (
-            <li key={s.id} aria-current={s.id === nextMatch?.stageId ? "step" : undefined}>
-              <span className="stage-name">{s.name}</span>
-              <span className="stage-dates">
-                {s.startsOn === s.endsOn ? formatDay(s.startsOn) : `${formatDay(s.startsOn)} – ${formatDay(s.endsOn)}`}
-              </span>
-            </li>
-          ))}
-        </ol>
+        <SectionHeading id="stages">Stages</SectionHeading>
+        <List.Root as="ol" listStyle="none" borderTopWidth="1px">
+          {stages.map((s) => {
+            const current = s.id === nextMatch?.stageId
+            return (
+              <List.Item
+                key={s.id}
+                aria-current={current ? "step" : undefined}
+                display="flex"
+                justifyContent="space-between"
+                gap="4"
+                py="3"
+                borderBottomWidth="1px"
+              >
+                <Text as="span" color={current ? "accent" : undefined} fontWeight={current ? "semibold" : undefined}>
+                  {s.name}
+                </Text>
+                <Text as="span" color="fg.muted" fontVariantNumeric="tabular-nums">
+                  {s.startsOn === s.endsOn ? formatDay(s.startsOn) : `${formatDay(s.startsOn)} – ${formatDay(s.endsOn)}`}
+                </Text>
+              </List.Item>
+            )
+          })}
+        </List.Root>
       </section>
-    </main>
+    </Container>
+  )
+}
+
+function SectionHeading({ id, children }: { id: string; children: ReactNode }) {
+  return (
+    <Heading id={id} as="h2" textStyle="xs" textTransform="uppercase" letterSpacing="wider" color="fg.muted" mt="10" mb="3">
+      {children}
+    </Heading>
   )
 }
